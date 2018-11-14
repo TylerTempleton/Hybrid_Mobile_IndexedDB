@@ -1,0 +1,883 @@
+<!-- 
+SYST35300 –Hybrid Mobile App Development
+Assignment #1Page 1 of 2 Description:
+You have been contracted to develop a mobile app using JQuery Mobile for SellMore Company Ltd. in Ontario.
+SellMore is a wholesaler that sells computer parts to its clients all over Canada. The scope of work 
+will include the following:1.Createan IndexedDBdatabase to store the customer information 
+(see below for layout).
+
+2.The application will do the following:
+a.Add new customer.
+b.Update customer information.
+c.Delete existing customer.
+d.List all customer ID.
+e.Display customer detail information.
+
+3.Makeup your own data for at least 10 records and a batch load feature to load these records
+
+
+
+ -->
+
+
+
+
+
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>jQuery Mobile: Theme Download</title>
+	<link rel="stylesheet" href="themes/assignment1.min.css" />
+	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+      
+    $(document).ready(function() {  
+
+        $('#cTable').hide()    
+window.indexDB = window.indexedDB
+window.mozIndexedDB
+window.webkitIndexedDB
+window.msIndexedDB; 
+if (!window.indexedDB)  { 
+alert("you  aren't supported");
+}//window.indexedDB
+<!-- Create Customers database-->
+var request =window.indexedDB.open("Customers", 1);
+request.onupgradeneeded= function(event) {
+	db= event.target.result;// global scope 
+	
+	
+	var obj = db.createObjectStore("Customers",{keyPath:"compId", autoIncrement: true});
+	<!-- Create INdexes -->
+	obj.createIndex("compId", "compId",{ unique: false });
+	obj.createIndex("compName", "compName",{ unique: true });
+	obj.createIndex("compPost", "compPost",{ unique: false });
+	
+	
+	
+} 
+
+
+request.onsuccess= (function(event) {
+	db= event.target.result;// global scope  
+alert("successful event");
+});
+  request.onerror= function(event) {
+	db= event.target.result;// global scope  
+alert("error event");
+}
+
+request.onblock= function(event) {
+	db= event.target.result;// global scope  
+alert("block event");
+}
+
+<!-- Adding Customers from form to database function -->
+$("#create-user").on( "click", function() {
+   var transaction = db.transaction(["Customers"],"readwrite");
+	var objectStore= transaction.objectStore("Customers");  
+	 objectStore.add( 
+            {
+                "compName": 	$("#cname").val(),
+                "compAddr": 	$("#cAdd").val(),
+				"compCity":		$("#cCity").val(),
+				"compCountry":	$("#cCountry").val(),
+				"compPost":	    $("#cPost").val(),
+				"compContact":	$("#cContact").val(),
+				"compPhone":	$("#cPhone").val(),
+				"compEmail":	$("#cEmail").val()
+            }
+           
+        );
+
+    request.onsuccess= function(event) {
+	alert("The Company has been added to your database."); 
+	};
+	request.onerror= function(event) {
+	alert("the Company already exist in your database! ");
+	};
+    });
+$("#add").on( "click", function() {
+	var transaction = db.transaction(["Customers"],"readwrite");
+	var objectStore= transaction.objectStore("Customers");
+	var request = objectStore.add({ compName: "Test Company", 			compAddr: "123 test st.",					compCity:"test",		compCountry:"CA", compPost:"h1h0h0", compContact:"test",compPhone:"555-555-5555", 	compEmail: "123@gmail.com"});
+	var request = objectStore.add({ compName: "herpderp INc.",  compAddr: "124 fake st", 					compCity:"derp",		compCountry:"CA", compPost:"h0h1h0", compContact:"tnt",compPhone:"555-555-5555" ,	compEmail: "567@gmail.com"});
+	var request = objectStore.add({ compName: "TNT", 			compAddr: "42 Northwind dr.", 				compCity:"Mississagua",	compCountry:"CA", compPost:"h0h0h1", compContact:"tommy",compPhone:"555-555-5555",	compEmail: "890@gmail.com"});
+	var request = objectStore.add({ compName: "Acme", 			compAddr: "123 fake st", 					compCity:"Toronto",		compCountry:"CA", compPost:"h2h0h0", compContact:"jane",compPhone:"555-555-5555",	compEmail: "herpdepr@gmail.com"});
+	var request = objectStore.add({ compName: "Capcom",		 	compAddr: "12 herp derp cr.", 				compCity:"Nagoya",		compCountry:"JP", compPost:"h0h2h0", compContact:"john",compPhone:"555-555-5555",	compEmail: "alokf@gmail.com"});
+	var request = objectStore.add({ compName: "Atlus",		    compAddr: "5 Persona cr.", 					compCity:"Shibuya",		compCountry:"JP", compPost:"h0h0h2", compContact:"phil",compPhone:"555-555-5555",	compEmail: "akdn@gmail.com"});
+	var request = objectStore.add({ compName: "Arc Sys", 		compAddr: "10 Guilty Gear lan", 			compCity:"Osaka",		compCountry:"JP", compPost:"a1b2c3", compContact:"Debra",compPhone:"555-555-5555",	compEmail: "ald@gmail.com"});
+	var request = objectStore.add({ compName: "Examus", 		compAddr: "142 Kanto st.", 					compCity:"Kyoto",		compCountry:"JP", compPost:"a5a5a5", compContact:"Hao",compPhone:"555-555-5555",	compEmail: "daoh888@gmail.com"});
+	var request = objectStore.add({ compName: "ANIMU", 			compAddr: "363 Akiabara place", 			compCity:"Tokiyo",		compCountry:"JP", compPost:"g4g4g4", compContact:"Sam",compPhone:"555-555-5555"	,	compEmail: "hotmail@gmail.com"});
+	var request = objectStore.add({ compName: "OMGWHY", 		compAddr: "666 Lucifer lane", 				compCity:"Hell",		compCountry:"US", compPost:"h3h0h0", compContact:"Kat",compPhone:"555-555-5555"	,	compEmail: "everythingburns@gmail.com"});
+	
+	request.onsuccess= function(event) {
+	alert("The group has been added to your database."); 
+	};
+	request.onerror= function(event) {
+	alert("the group already exist in your database! ");
+	};
+	
+})
+
+
+
+
+	
+$("#find").click(function(){
+	var transaction = db.transaction(["Customers"],"readwrite");
+	var objectStore= transaction.objectStore("Customers");
+	var findme = $("#upCname").val();
+	var myIndex = objectStore.index('compName');
+	var getKeyRequest = myIndex.getKey(findme);
+	getKeyRequest.onsuccess = function() {
+	 console.log(getKeyRequest.result);
+	var cursor = event.target.result;
+if (cursor){
+if (cursor.key == getKeyRequest){
+	var updateData=cursor.value;
+	updateData.compAddr = $("#upcAdd".val());
+	updateData.compCity = $("#upcCity".val());
+	updateData.compCountry	= $("#upcCountry".val());
+	updateData.compPost	= $("#upcPost".val());
+	updateData.compContact	= $("#upcContact".val());
+	updateData.compPhone	= $("#upcPhone".val());
+	updateData.compEmail	= $("#upcEmail".val());
+	}
+	
+}
+	}
+  } );
+  
+  
+  $("#delete").on( "click", function() {
+    var transaction = db.transaction(["Customers"],"readwrite");
+	var objectStore= transaction.objectStore("Customers");
+	var killme = $("#delCname").val();
+	var myIndex = objectStore.index('compName');
+	var getKeyRequest = myIndex.getKey(killme);
+	getKeyRequest.onsuccess = function() {
+    console.log(getKeyRequest.result);
+	objectStore.delete(getKeyRequest.result);
+	alert("record deleted");
+  }
+ getKeyRequest.onerror = function() {
+ alert("no data exists");
+ }
+  });
+  
+  $("#listId").click(function(event){
+  $("#cnameList").html('');
+var transaction = db.transaction(["Customers"],"readonly");
+var objectStore= transaction.objectStore("Customers");
+var index = objectStore.index("compName");
+var request = objectStore.getAll();
+request.onsuccess =function(event){
+	if(request.result){
+		for( var i in request.result)
+		
+		$("#cnameList").append(request.result[i].compName + "</br>");
+		}
+	else alert("no data exists");}
+});
+
+
+
+
+  
+/*  
+  $("#listAll").click(function(event){
+  $('#cTable').show();
+  $('#cTable').html=('');
+var transaction = db.transaction(["Customers"],"readonly");
+var objectStore= transaction.objectStore("Customers");
+var index = objectStore.index("compName");
+var request = objectStore.getAll();
+index.openCursor().onsuccess = function(event) {
+var cursor = event.target.result;
+	if(cursor){
+		for( var field in cursor.value)
+		$("#cTable").append('<tr>'+'<td>' + cursor.value.compName + '</td>')
+		+('<td>' + cursor.value.compAddr+ '</td>')
+        +('<td>' + cursor.value.compCity + '</td>')
+        +('<td>' + cursor.value.compCountry+ '</td>')
+        +('<td>' + cursor.value.compPost + '</td>')
+        +('<td>' + cursor.value.compContact + '</td>')
+        +('<td>' + cursor.value.compPhone + '</td>')
+        +('<td>' + cursor.value.compEmail + '</td>'+ '</tr>'); 
+        cursor.continue();
+		
+		
+		
+		
+		
+		}
+	else alert("no data exists");}
+});
+
+*/
+
+
+
+  
+  
+  $("#nuke").click(function(){
+var transaction = db.transaction(["Customers"],"readwrite");
+var objectStore= transaction.objectStore("Customers");
+var request = objectStore.clear();
+request.onsuccess= function(event){
+alert("Records deleted from object store.");
+}
+});
+   });
+ </script>
+ 
+ 
+ 
+	<div data-role="page" data-theme="a">
+		<div data-role="header" data-position="inline">
+			<h1>SellMore Ltd:
+			Tyler Templeton Assignment 1</h1>
+		</div>
+		<div data-role="content" data-theme="a">
+		<div class="content-primary"> 
+		
+		<ul data-role="listview"> 
+		<li> <a href="#myPopup" data-rel="popup"> <img src="img/adduser.png" /> 
+		<h3>Add Customer</h3> 
+		<p>click to add customer to table</p> 
+		</a></li> 
+		
+		<li> <a href="#" id="add"> <img src="img/add_users.png" /> 
+		<h3>Load Default Users</h3> 
+		<p>Load 10 default dummy Customer Information</p> 
+		</a>
+		</li>
+		<li> <a href="#updatePopup" data-rel="popup" id = "update"> <img src="img/edit.ico" /> 
+		<h3>Update</h3> 
+		<p>Update Customer Information</p> 
+		</a>
+		</li>
+		<li> <a href="#delPopup" data-rel="popup" id="deleteCustomer"> <img src="img/remove_user_.png" /> 
+		<h3>Delete</h3> 
+		<p>Delete Existing customer information</p> 
+		</a>
+		</li>
+		<li> <a href="#"id="listId"> <img src="img/id.png" /> 
+		<h3>List ID of Customers</h3> 
+		<p>List ALL employee ID </p> 
+		</a>
+		</li>
+		
+		<!-- <li> <a href="#lAll" id ="listAll"> <img src="img/see-all.png" /> 
+		<h3>List Customers</h3> 
+		<p>List ALL employee information</p> 
+		</a>
+		</li>
+		 -->
+		
+		<li> <a href="#" id = "nuke"> <img src="img/nuke.png" /> 
+		<h3>Delete All Customers</h3> 
+		<p>Delete ALL employee information</p> 
+		</a>
+		</li>
+</ul>
+    <div data-role="popup" id="myPopup" class="ui-content" style="min-width:250px;">
+      <form method="post" >
+        <div>
+          <h3>User Information</h3>
+         
+		 Company Name:<label for="cname" class="ui-hidden-accessible">Company Name:</label>
+          <input type="text" required name="companyName" id="cname" placeholder="Company Name">
+          
+		  Address:<label for="cAdd" class="ui-hidden-accessible">Address</label>
+          <input type="text" required name="address" id="cAdd" placeholder="address">
+          
+		  City:<label for="cCity" class="ui-hidden-accessible">City</label>
+          <input type="text" required name="city" id="cCity" placeholder="City">
+		  <!-- Country dropdown code was used from freeformatter.com/iso-country-list-html-select.html -->
+		  Country:<select id = "cCountry">
+	<option value="AF">Afghanistan</option>
+	<option value="AX">Åland Islands</option>
+	<option value="AL">Albania</option>
+	<option value="DZ">Algeria</option>
+	<option value="AS">American Samoa</option>
+	<option value="AD">Andorra</option>
+	<option value="AO">Angola</option>
+	<option value="AI">Anguilla</option>
+	<option value="AQ">Antarctica</option>
+	<option value="AG">Antigua and Barbuda</option>
+	<option value="AR">Argentina</option>
+	<option value="AM">Armenia</option>
+	<option value="AW">Aruba</option>
+	<option value="AU">Australia</option>
+	<option value="AT">Austria</option>
+	<option value="AZ">Azerbaijan</option>
+	<option value="BS">Bahamas</option>
+	<option value="BH">Bahrain</option>
+	<option value="BD">Bangladesh</option>
+	<option value="BB">Barbados</option>
+	<option value="BY">Belarus</option>
+	<option value="BE">Belgium</option>
+	<option value="BZ">Belize</option>
+	<option value="BJ">Benin</option>
+	<option value="BM">Bermuda</option>
+	<option value="BT">Bhutan</option>
+	<option value="BO">Bolivia, Plurinational State of</option>
+	<option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+	<option value="BA">Bosnia and Herzegovina</option>
+	<option value="BW">Botswana</option>
+	<option value="BV">Bouvet Island</option>
+	<option value="BR">Brazil</option>
+	<option value="IO">British Indian Ocean Territory</option>
+	<option value="BN">Brunei Darussalam</option>
+	<option value="BG">Bulgaria</option>
+	<option value="BF">Burkina Faso</option>
+	<option value="BI">Burundi</option>
+	<option value="KH">Cambodia</option>
+	<option value="CM">Cameroon</option>
+	<option value="CA">Canada</option>
+	<option value="CV">Cape Verde</option>
+	<option value="KY">Cayman Islands</option>
+	<option value="CF">Central African Republic</option>
+	<option value="TD">Chad</option>
+	<option value="CL">Chile</option>
+	<option value="CN">China</option>
+	<option value="CX">Christmas Island</option>
+	<option value="CC">Cocos (Keeling) Islands</option>
+	<option value="CO">Colombia</option>
+	<option value="KM">Comoros</option>
+	<option value="CG">Congo</option>
+	<option value="CD">Congo, the Democratic Republic of the</option>
+	<option value="CK">Cook Islands</option>
+	<option value="CR">Costa Rica</option>
+	<option value="CI">Côte d'Ivoire</option>
+	<option value="HR">Croatia</option>
+	<option value="CU">Cuba</option>
+	<option value="CW">Curaçao</option>
+	<option value="CY">Cyprus</option>
+	<option value="CZ">Czech Republic</option>
+	<option value="DK">Denmark</option>
+	<option value="DJ">Djibouti</option>
+	<option value="DM">Dominica</option>
+	<option value="DO">Dominican Republic</option>
+	<option value="EC">Ecuador</option>
+	<option value="EG">Egypt</option>
+	<option value="SV">El Salvador</option>
+	<option value="GQ">Equatorial Guinea</option>
+	<option value="ER">Eritrea</option>
+	<option value="EE">Estonia</option>
+	<option value="ET">Ethiopia</option>
+	<option value="FK">Falkland Islands (Malvinas)</option>
+	<option value="FO">Faroe Islands</option>
+	<option value="FJ">Fiji</option>
+	<option value="FI">Finland</option>
+	<option value="FR">France</option>
+	<option value="GF">French Guiana</option>
+	<option value="PF">French Polynesia</option>
+	<option value="TF">French Southern Territories</option>
+	<option value="GA">Gabon</option>
+	<option value="GM">Gambia</option>
+	<option value="GE">Georgia</option>
+	<option value="DE">Germany</option>
+	<option value="GH">Ghana</option>
+	<option value="GI">Gibraltar</option>
+	<option value="GR">Greece</option>
+	<option value="GL">Greenland</option>
+	<option value="GD">Grenada</option>
+	<option value="GP">Guadeloupe</option>
+	<option value="GU">Guam</option>
+	<option value="GT">Guatemala</option>
+	<option value="GG">Guernsey</option>
+	<option value="GN">Guinea</option>
+	<option value="GW">Guinea-Bissau</option>
+	<option value="GY">Guyana</option>
+	<option value="HT">Haiti</option>
+	<option value="HM">Heard Island and McDonald Islands</option>
+	<option value="VA">Holy See (Vatican City State)</option>
+	<option value="HN">Honduras</option>
+	<option value="HK">Hong Kong</option>
+	<option value="HU">Hungary</option>
+	<option value="IS">Iceland</option>
+	<option value="IN">India</option>
+	<option value="ID">Indonesia</option>
+	<option value="IR">Iran, Islamic Republic of</option>
+	<option value="IQ">Iraq</option>
+	<option value="IE">Ireland</option>
+	<option value="IM">Isle of Man</option>
+	<option value="IL">Israel</option>
+	<option value="IT">Italy</option>
+	<option value="JM">Jamaica</option>
+	<option value="JP">Japan</option>
+	<option value="JE">Jersey</option>
+	<option value="JO">Jordan</option>
+	<option value="KZ">Kazakhstan</option>
+	<option value="KE">Kenya</option>
+	<option value="KI">Kiribati</option>
+	<option value="KP">Korea, Democratic People's Republic of</option>
+	<option value="KR">Korea, Republic of</option>
+	<option value="KW">Kuwait</option>
+	<option value="KG">Kyrgyzstan</option>
+	<option value="LA">Lao People's Democratic Republic</option>
+	<option value="LV">Latvia</option>
+	<option value="LB">Lebanon</option>
+	<option value="LS">Lesotho</option>
+	<option value="LR">Liberia</option>
+	<option value="LY">Libya</option>
+	<option value="LI">Liechtenstein</option>
+	<option value="LT">Lithuania</option>
+	<option value="LU">Luxembourg</option>
+	<option value="MO">Macao</option>
+	<option value="MK">Macedonia, the former Yugoslav Republic of</option>
+	<option value="MG">Madagascar</option>
+	<option value="MW">Malawi</option>
+	<option value="MY">Malaysia</option>
+	<option value="MV">Maldives</option>
+	<option value="ML">Mali</option>
+	<option value="MT">Malta</option>
+	<option value="MH">Marshall Islands</option>
+	<option value="MQ">Martinique</option>
+	<option value="MR">Mauritania</option>
+	<option value="MU">Mauritius</option>
+	<option value="YT">Mayotte</option>
+	<option value="MX">Mexico</option>
+	<option value="FM">Micronesia, Federated States of</option>
+	<option value="MD">Moldova, Republic of</option>
+	<option value="MC">Monaco</option>
+	<option value="MN">Mongolia</option>
+	<option value="ME">Montenegro</option>
+	<option value="MS">Montserrat</option>
+	<option value="MA">Morocco</option>
+	<option value="MZ">Mozambique</option>
+	<option value="MM">Myanmar</option>
+	<option value="NA">Namibia</option>
+	<option value="NR">Nauru</option>
+	<option value="NP">Nepal</option>
+	<option value="NL">Netherlands</option>
+	<option value="NC">New Caledonia</option>
+	<option value="NZ">New Zealand</option>
+	<option value="NI">Nicaragua</option>
+	<option value="NE">Niger</option>
+	<option value="NG">Nigeria</option>
+	<option value="NU">Niue</option>
+	<option value="NF">Norfolk Island</option>
+	<option value="MP">Northern Mariana Islands</option>
+	<option value="NO">Norway</option>
+	<option value="OM">Oman</option>
+	<option value="PK">Pakistan</option>
+	<option value="PW">Palau</option>
+	<option value="PS">Palestinian Territory, Occupied</option>
+	<option value="PA">Panama</option>
+	<option value="PG">Papua New Guinea</option>
+	<option value="PY">Paraguay</option>
+	<option value="PE">Peru</option>
+	<option value="PH">Philippines</option>
+	<option value="PN">Pitcairn</option>
+	<option value="PL">Poland</option>
+	<option value="PT">Portugal</option>
+	<option value="PR">Puerto Rico</option>
+	<option value="QA">Qatar</option>
+	<option value="RE">Réunion</option>
+	<option value="RO">Romania</option>
+	<option value="RU">Russian Federation</option>
+	<option value="RW">Rwanda</option>
+	<option value="BL">Saint Barthélemy</option>
+	<option value="SH">Saint Helena, Ascension and Tristan da Cunha</option>
+	<option value="KN">Saint Kitts and Nevis</option>
+	<option value="LC">Saint Lucia</option>
+	<option value="MF">Saint Martin (French part)</option>
+	<option value="PM">Saint Pierre and Miquelon</option>
+	<option value="VC">Saint Vincent and the Grenadines</option>
+	<option value="WS">Samoa</option>
+	<option value="SM">San Marino</option>
+	<option value="ST">Sao Tome and Principe</option>
+	<option value="SA">Saudi Arabia</option>
+	<option value="SN">Senegal</option>
+	<option value="RS">Serbia</option>
+	<option value="SC">Seychelles</option>
+	<option value="SL">Sierra Leone</option>
+	<option value="SG">Singapore</option>
+	<option value="SX">Sint Maarten (Dutch part)</option>
+	<option value="SK">Slovakia</option>
+	<option value="SI">Slovenia</option>
+	<option value="SB">Solomon Islands</option>
+	<option value="SO">Somalia</option>
+	<option value="ZA">South Africa</option>
+	<option value="GS">South Georgia and the South Sandwich Islands</option>
+	<option value="SS">South Sudan</option>
+	<option value="ES">Spain</option>
+	<option value="LK">Sri Lanka</option>
+	<option value="SD">Sudan</option>
+	<option value="SR">Suriname</option>
+	<option value="SJ">Svalbard and Jan Mayen</option>
+	<option value="SZ">Swaziland</option>
+	<option value="SE">Sweden</option>
+	<option value="CH">Switzerland</option>
+	<option value="SY">Syrian Arab Republic</option>
+	<option value="TW">Taiwan, Province of China</option>
+	<option value="TJ">Tajikistan</option>
+	<option value="TZ">Tanzania, United Republic of</option>
+	<option value="TH">Thailand</option>
+	<option value="TL">Timor-Leste</option>
+	<option value="TG">Togo</option>
+	<option value="TK">Tokelau</option>
+	<option value="TO">Tonga</option>
+	<option value="TT">Trinidad and Tobago</option>
+	<option value="TN">Tunisia</option>
+	<option value="TR">Turkey</option>
+	<option value="TM">Turkmenistan</option>
+	<option value="TC">Turks and Caicos Islands</option>
+	<option value="TV">Tuvalu</option>
+	<option value="UG">Uganda</option>
+	<option value="UA">Ukraine</option>
+	<option value="AE">United Arab Emirates</option>
+	<option value="GB">United Kingdom</option>
+	<option value="US">United States</option>
+	<option value="UM">United States Minor Outlying Islands</option>
+	<option value="UY">Uruguay</option>
+	<option value="UZ">Uzbekistan</option>
+	<option value="VU">Vanuatu</option>
+	<option value="VE">Venezuela, Bolivarian Republic of</option>
+	<option value="VN">Viet Nam</option>
+	<option value="VG">Virgin Islands, British</option>
+	<option value="VI">Virgin Islands, U.S.</option>
+	<option value="WF">Wallis and Futuna</option>
+	<option value="EH">Western Sahara</option>
+	<option value="YE">Yemen</option>
+	<option value="ZM">Zambia</option>
+	<option value="ZW">Zimbabwe</option>
+</select>
+		  
+		  
+		  Postal Code:<label for="cPost" class="ui-hidden-accessible">Postal Code</label>
+          <input type="text" required name="" id="cPost" placeholder="Postal Code">
+		  
+		  Contact:<label for="cContact" class="ui-hidden-accessible">Contact</label>
+          <input type="text" required name="" id="cContact" placeholder="Contact">
+		  
+		  Phone Number:<label for="cPhone" class="ui-hidden-accessible">Phone Number</label>
+          <input type="tel" required name="" id="cPhone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-567-8901" size="20" minlength="9" maxlength="14">
+		  <input type="email" required name="" id="cEmail"  pattern="[^ @]*@[^ @]*" placeholder="test@email.com" >
+		  
+          <input type="submit" id="create-user" data-inline="true" value="Submit">
+        </div>
+      </form>
+    </div>
+  </div>
+ <div data-role="popup" id="delPopup" class="ui-content" style="min-width:250px;">
+ Company Name:<label for="cname" class="ui-hidden-accessible">Company Name:</label>
+          <input type="text" required name="updateCompanyName" id="delCname" placeholder="Company Name">
+		   <input type="submit" id="delete" data-inline="true" value="Submit">
+ </div>
+ <div data-role="popup" id="updatePopup" class="ui-content" style="min-width:250px;">
+  <input type="text" required name="updateCompanyName" id="upCname" placeholder="Company Name">
+		   
+  Address:<label for="cAdd" class="ui-hidden-accessible">Address</label>
+          <input type="text" required name="address" id="upcAdd" placeholder="address">
+          
+		  City:<label for="cCity" class="ui-hidden-accessible">City</label>
+          <input type="text" required name="city" id="upcCity" placeholder="City">
+		  <!-- Country dropdown code was used from freeformatter.com/iso-country-list-html-select.html -->
+		  Country:<select id = "upcCountry">
+	<option value="AF">Afghanistan</option>
+	<option value="AX">Åland Islands</option>
+	<option value="AL">Albania</option>
+	<option value="DZ">Algeria</option>
+	<option value="AS">American Samoa</option>
+	<option value="AD">Andorra</option>
+	<option value="AO">Angola</option>
+	<option value="AI">Anguilla</option>
+	<option value="AQ">Antarctica</option>
+	<option value="AG">Antigua and Barbuda</option>
+	<option value="AR">Argentina</option>
+	<option value="AM">Armenia</option>
+	<option value="AW">Aruba</option>
+	<option value="AU">Australia</option>
+	<option value="AT">Austria</option>
+	<option value="AZ">Azerbaijan</option>
+	<option value="BS">Bahamas</option>
+	<option value="BH">Bahrain</option>
+	<option value="BD">Bangladesh</option>
+	<option value="BB">Barbados</option>
+	<option value="BY">Belarus</option>
+	<option value="BE">Belgium</option>
+	<option value="BZ">Belize</option>
+	<option value="BJ">Benin</option>
+	<option value="BM">Bermuda</option>
+	<option value="BT">Bhutan</option>
+	<option value="BO">Bolivia, Plurinational State of</option>
+	<option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+	<option value="BA">Bosnia and Herzegovina</option>
+	<option value="BW">Botswana</option>
+	<option value="BV">Bouvet Island</option>
+	<option value="BR">Brazil</option>
+	<option value="IO">British Indian Ocean Territory</option>
+	<option value="BN">Brunei Darussalam</option>
+	<option value="BG">Bulgaria</option>
+	<option value="BF">Burkina Faso</option>
+	<option value="BI">Burundi</option>
+	<option value="KH">Cambodia</option>
+	<option value="CM">Cameroon</option>
+	<option value="CA">Canada</option>
+	<option value="CV">Cape Verde</option>
+	<option value="KY">Cayman Islands</option>
+	<option value="CF">Central African Republic</option>
+	<option value="TD">Chad</option>
+	<option value="CL">Chile</option>
+	<option value="CN">China</option>
+	<option value="CX">Christmas Island</option>
+	<option value="CC">Cocos (Keeling) Islands</option>
+	<option value="CO">Colombia</option>
+	<option value="KM">Comoros</option>
+	<option value="CG">Congo</option>
+	<option value="CD">Congo, the Democratic Republic of the</option>
+	<option value="CK">Cook Islands</option>
+	<option value="CR">Costa Rica</option>
+	<option value="CI">Côte d'Ivoire</option>
+	<option value="HR">Croatia</option>
+	<option value="CU">Cuba</option>
+	<option value="CW">Curaçao</option>
+	<option value="CY">Cyprus</option>
+	<option value="CZ">Czech Republic</option>
+	<option value="DK">Denmark</option>
+	<option value="DJ">Djibouti</option>
+	<option value="DM">Dominica</option>
+	<option value="DO">Dominican Republic</option>
+	<option value="EC">Ecuador</option>
+	<option value="EG">Egypt</option>
+	<option value="SV">El Salvador</option>
+	<option value="GQ">Equatorial Guinea</option>
+	<option value="ER">Eritrea</option>
+	<option value="EE">Estonia</option>
+	<option value="ET">Ethiopia</option>
+	<option value="FK">Falkland Islands (Malvinas)</option>
+	<option value="FO">Faroe Islands</option>
+	<option value="FJ">Fiji</option>
+	<option value="FI">Finland</option>
+	<option value="FR">France</option>
+	<option value="GF">French Guiana</option>
+	<option value="PF">French Polynesia</option>
+	<option value="TF">French Southern Territories</option>
+	<option value="GA">Gabon</option>
+	<option value="GM">Gambia</option>
+	<option value="GE">Georgia</option>
+	<option value="DE">Germany</option>
+	<option value="GH">Ghana</option>
+	<option value="GI">Gibraltar</option>
+	<option value="GR">Greece</option>
+	<option value="GL">Greenland</option>
+	<option value="GD">Grenada</option>
+	<option value="GP">Guadeloupe</option>
+	<option value="GU">Guam</option>
+	<option value="GT">Guatemala</option>
+	<option value="GG">Guernsey</option>
+	<option value="GN">Guinea</option>
+	<option value="GW">Guinea-Bissau</option>
+	<option value="GY">Guyana</option>
+	<option value="HT">Haiti</option>
+	<option value="HM">Heard Island and McDonald Islands</option>
+	<option value="VA">Holy See (Vatican City State)</option>
+	<option value="HN">Honduras</option>
+	<option value="HK">Hong Kong</option>
+	<option value="HU">Hungary</option>
+	<option value="IS">Iceland</option>
+	<option value="IN">India</option>
+	<option value="ID">Indonesia</option>
+	<option value="IR">Iran, Islamic Republic of</option>
+	<option value="IQ">Iraq</option>
+	<option value="IE">Ireland</option>
+	<option value="IM">Isle of Man</option>
+	<option value="IL">Israel</option>
+	<option value="IT">Italy</option>
+	<option value="JM">Jamaica</option>
+	<option value="JP">Japan</option>
+	<option value="JE">Jersey</option>
+	<option value="JO">Jordan</option>
+	<option value="KZ">Kazakhstan</option>
+	<option value="KE">Kenya</option>
+	<option value="KI">Kiribati</option>
+	<option value="KP">Korea, Democratic People's Republic of</option>
+	<option value="KR">Korea, Republic of</option>
+	<option value="KW">Kuwait</option>
+	<option value="KG">Kyrgyzstan</option>
+	<option value="LA">Lao People's Democratic Republic</option>
+	<option value="LV">Latvia</option>
+	<option value="LB">Lebanon</option>
+	<option value="LS">Lesotho</option>
+	<option value="LR">Liberia</option>
+	<option value="LY">Libya</option>
+	<option value="LI">Liechtenstein</option>
+	<option value="LT">Lithuania</option>
+	<option value="LU">Luxembourg</option>
+	<option value="MO">Macao</option>
+	<option value="MK">Macedonia, the former Yugoslav Republic of</option>
+	<option value="MG">Madagascar</option>
+	<option value="MW">Malawi</option>
+	<option value="MY">Malaysia</option>
+	<option value="MV">Maldives</option>
+	<option value="ML">Mali</option>
+	<option value="MT">Malta</option>
+	<option value="MH">Marshall Islands</option>
+	<option value="MQ">Martinique</option>
+	<option value="MR">Mauritania</option>
+	<option value="MU">Mauritius</option>
+	<option value="YT">Mayotte</option>
+	<option value="MX">Mexico</option>
+	<option value="FM">Micronesia, Federated States of</option>
+	<option value="MD">Moldova, Republic of</option>
+	<option value="MC">Monaco</option>
+	<option value="MN">Mongolia</option>
+	<option value="ME">Montenegro</option>
+	<option value="MS">Montserrat</option>
+	<option value="MA">Morocco</option>
+	<option value="MZ">Mozambique</option>
+	<option value="MM">Myanmar</option>
+	<option value="NA">Namibia</option>
+	<option value="NR">Nauru</option>
+	<option value="NP">Nepal</option>
+	<option value="NL">Netherlands</option>
+	<option value="NC">New Caledonia</option>
+	<option value="NZ">New Zealand</option>
+	<option value="NI">Nicaragua</option>
+	<option value="NE">Niger</option>
+	<option value="NG">Nigeria</option>
+	<option value="NU">Niue</option>
+	<option value="NF">Norfolk Island</option>
+	<option value="MP">Northern Mariana Islands</option>
+	<option value="NO">Norway</option>
+	<option value="OM">Oman</option>
+	<option value="PK">Pakistan</option>
+	<option value="PW">Palau</option>
+	<option value="PS">Palestinian Territory, Occupied</option>
+	<option value="PA">Panama</option>
+	<option value="PG">Papua New Guinea</option>
+	<option value="PY">Paraguay</option>
+	<option value="PE">Peru</option>
+	<option value="PH">Philippines</option>
+	<option value="PN">Pitcairn</option>
+	<option value="PL">Poland</option>
+	<option value="PT">Portugal</option>
+	<option value="PR">Puerto Rico</option>
+	<option value="QA">Qatar</option>
+	<option value="RE">Réunion</option>
+	<option value="RO">Romania</option>
+	<option value="RU">Russian Federation</option>
+	<option value="RW">Rwanda</option>
+	<option value="BL">Saint Barthélemy</option>
+	<option value="SH">Saint Helena, Ascension and Tristan da Cunha</option>
+	<option value="KN">Saint Kitts and Nevis</option>
+	<option value="LC">Saint Lucia</option>
+	<option value="MF">Saint Martin (French part)</option>
+	<option value="PM">Saint Pierre and Miquelon</option>
+	<option value="VC">Saint Vincent and the Grenadines</option>
+	<option value="WS">Samoa</option>
+	<option value="SM">San Marino</option>
+	<option value="ST">Sao Tome and Principe</option>
+	<option value="SA">Saudi Arabia</option>
+	<option value="SN">Senegal</option>
+	<option value="RS">Serbia</option>
+	<option value="SC">Seychelles</option>
+	<option value="SL">Sierra Leone</option>
+	<option value="SG">Singapore</option>
+	<option value="SX">Sint Maarten (Dutch part)</option>
+	<option value="SK">Slovakia</option>
+	<option value="SI">Slovenia</option>
+	<option value="SB">Solomon Islands</option>
+	<option value="SO">Somalia</option>
+	<option value="ZA">South Africa</option>
+	<option value="GS">South Georgia and the South Sandwich Islands</option>
+	<option value="SS">South Sudan</option>
+	<option value="ES">Spain</option>
+	<option value="LK">Sri Lanka</option>
+	<option value="SD">Sudan</option>
+	<option value="SR">Suriname</option>
+	<option value="SJ">Svalbard and Jan Mayen</option>
+	<option value="SZ">Swaziland</option>
+	<option value="SE">Sweden</option>
+	<option value="CH">Switzerland</option>
+	<option value="SY">Syrian Arab Republic</option>
+	<option value="TW">Taiwan, Province of China</option>
+	<option value="TJ">Tajikistan</option>
+	<option value="TZ">Tanzania, United Republic of</option>
+	<option value="TH">Thailand</option>
+	<option value="TL">Timor-Leste</option>
+	<option value="TG">Togo</option>
+	<option value="TK">Tokelau</option>
+	<option value="TO">Tonga</option>
+	<option value="TT">Trinidad and Tobago</option>
+	<option value="TN">Tunisia</option>
+	<option value="TR">Turkey</option>
+	<option value="TM">Turkmenistan</option>
+	<option value="TC">Turks and Caicos Islands</option>
+	<option value="TV">Tuvalu</option>
+	<option value="UG">Uganda</option>
+	<option value="UA">Ukraine</option>
+	<option value="AE">United Arab Emirates</option>
+	<option value="GB">United Kingdom</option>
+	<option value="US">United States</option>
+	<option value="UM">United States Minor Outlying Islands</option>
+	<option value="UY">Uruguay</option>
+	<option value="UZ">Uzbekistan</option>
+	<option value="VU">Vanuatu</option>
+	<option value="VE">Venezuela, Bolivarian Republic of</option>
+	<option value="VN">Viet Nam</option>
+	<option value="VG">Virgin Islands, British</option>
+	<option value="VI">Virgin Islands, U.S.</option>
+	<option value="WF">Wallis and Futuna</option>
+	<option value="EH">Western Sahara</option>
+	<option value="YE">Yemen</option>
+	<option value="ZM">Zambia</option>
+	<option value="ZW">Zimbabwe</option>
+</select>
+		  
+		  
+		  Postal Code:<label for="cPost" class="ui-hidden-accessible">Postal Code</label>
+          <input type="text" required name="" id="upcPost" placeholder="Postal Code">
+		  
+		  Contact:<label for="cContact" class="ui-hidden-accessible">Contact</label>
+          <input type="text" required name="" id="upcContact" placeholder="Contact">
+		  
+		  Phone Number:<label for="cPhone" class="ui-hidden-accessible">Phone Number</label>
+          <input type="tel" required name="" id="upcPhone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-567-8901" size="20" minlength="9" maxlength="14">
+		  <input type="email" required name="" id="upcEmail"  pattern="[^ @]*@[^ @]*" placeholder="test@email.com" >
+		  <input type="submit" id="find" data-inline="true" value="Update">
+</div>
+<div data-role="popup" id="lAll" class="ui-content" style="min-width:250px;">
+
+  
+</div>
+<div>
+
+
+</div>
+<p id="cnameList"></p> 
+
+<table id="cTable"   border='1'>
+
+    <tr>
+        <th>Comapany</th>
+         <th>Address</th>
+		 <th>City</th>
+		 <th>Country</th>
+		 <th>Postal Code</th>
+		 <th>Contact</th>
+		 <th>Phone</th>
+		 <th>Email</th>
+    </tr>
+
+
+</table>
+</body>
+</html>
+		
+		
+		
+		
+		
+		
